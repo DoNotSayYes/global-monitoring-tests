@@ -1,0 +1,7 @@
+ssh_key_path: /Users/wilson/PycharmProjects/Rancher/env_rancher/tools/resource/wilson-sg.pem
+auth:
+  strategy: x509
+nodes:
+  - address: 3.0.100.186 
+    user: ubuntu
+    role: [etcd, controlplane,worker]

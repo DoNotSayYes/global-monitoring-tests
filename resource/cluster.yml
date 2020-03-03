@@ -1,0 +1,7 @@
+ssh_key_path: /Users/wilson/PycharmProjects/Rancher/env_rancher/tools/resource/$AWS_SSH_KEY_NAME
+auth:
+  strategy: x509
+nodes:
+  - address: $ip1 
+    user: ubuntu
+    role: [etcd, controlplane,worker]

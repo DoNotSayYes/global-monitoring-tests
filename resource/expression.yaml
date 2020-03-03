@@ -1,0 +1,85 @@
+  cluster_cpu_top: topk(5,    max_over_time(      (1 - (avg(irate(node_cpu_seconds_total{mode="idle"}[5m]))  by (prometheus_from)))[%(duration)s:]    )  )
+
+  cluster_cpu: (1 - (avg(irate(node_cpu_seconds_total{mode="idle", prometheus_from=~"%(params)s"}[5m])) by (prometheus_from)))
+
+  cluster_memory_top: topk(5,    max_over_time(      (1 - sum(node_memory_MemAvailable_bytes) by (prometheus_from) / sum(node_memory_MemTotal_bytes) by (prometheus_from))[%(duration)s:]    )  )
+
+  cluster_memory: (1 - sum(node_memory_MemAvailable_bytes{prometheus_from=~"%(params)s"}) by (prometheus_from) / sum(node_memory_MemTotal_bytes{prometheus_from=~"%(params)s"}) by (prometheus_from))
+
+  cluster_api_server_latency_top: topk(5,    max_over_time(      (avg(apiserver_request_latencies_sum / apiserver_request_latencies_count) by (instance, prometheus_from) /1e+06)[%(duration)s:]    )  )
+
+  cluster_api_server_latency: (avg(apiserver_request_latencies_sum{instance=~"%(params)s"} / apiserver_request_latencies_count{instance=~"%(params)s"}) by (instance, prometheus_from) /1e+06)
+
+  cluster_db_size_top: topk(5,    max_over_time(      etcd_debugging_mvcc_db_total_size_in_bytes[5m]    )  )
+
+  cluster_db_size: etcd_debugging_mvcc_db_total_size_in_bytes{instance=~"%(params)s"}
+
+  cluster_leader_change_num_top: topk(5,    max_over_time(      (floor(max(increase(etcd_server_leader_changes_seen_total[5m])) by (prometheus_from)))[%(duration)s:]    )  )
+
+  cluster_leader_change_num: (floor(max(increase(etcd_server_leader_changes_seen_total{prometheus_from=~"%(params)s"}[5m])) by (prometheus_from)))
+
+  cluster_disk_top: topk(5,    max_over_time(      ((sum(node_filesystem_size_bytes{device!~"rootfs|HarddiskVolume.+"}) by (prometheus_from) - sum(node_filesystem_free_bytes{device!~"rootfs|HarddiskVolume.+"}) by (prometheus_from)) / sum(node_filesystem_size_bytes{device!~"rootfs|HarddiskVolume.+"}) by (prometheus_from))[%(duration)s:]    )  )
+
+  cluster_disk: ((sum(node_filesystem_size_bytes{device!~"rootfs|HarddiskVolume.+", prometheus_from=~"%(params)s"}) by (prometheus_from) - sum(node_filesystem_free_bytes{device!~"rootfs|HarddiskVolume.+", prometheus_from=~"%(params)s"}) by (prometheus_from)) / sum(node_filesystem_size_bytes{device!~"rootfs|HarddiskVolume.+", prometheus_from=~"%(params)s"}) by (prometheus_from))
+
+  cluster_unhealthy_pod_num_top: topk(5,    max_over_time(      (sum(kube_pod_status_ready{condition="false"}) by (prometheus_from) - sum(kube_pod_status_phase{phase="Succeeded"}) by (prometheus_from) + sum(kube_pod_status_unschedulable) by (prometheus_from) )[%(duration)s:]    )  )
+
+  cluster_unhealthy_pod_num: sum(kube_pod_status_ready{condition="false", prometheus_from=~"%(params)s"}) by (prometheus_from) - sum(kube_pod_status_phase{phase="Succeeded", prometheus_from=~"%(params)s"}) by (prometheus_from) + sum(kube_pod_status_unschedulable{prometheus_from=~"%(params)s"}) by (prometheus_from)
+
+  cluster_pod_nonscheduled_total_top: topk(5,    max_over_time(      (sum(kube_pod_status_scheduled{condition="false"}) by (prometheus_from))[%(duration)s:]    )  )
+
+  cluster_pod_nonscheduled_total: (sum(kube_pod_status_scheduled{condition="false", prometheus_from=~"%(params)s"}) by (prometheus_from))
+
+  cluster_pod_restart_total_top: topk(5,    max_over_time(      (floor(sum(increase(kube_pod_container_status_restarts_total[5m])) by (prometheus_from)))[%(duration)s:]    )  )
+
+  cluster_pod_restart_total: (floor(sum(increase(kube_pod_container_status_restarts_total{prometheus_from=~"%(params)s"}[5m])) by (prometheus_from)))
+
+  node_load_top: topk(5,    max_over_time(      node_load5[%(duration)s:]    )  )
+
+  node_load: node_load5{node_id=~"%(params)s"}
+
+  node_disk: topk(5,    ((sum(node_filesystem_size_bytes{device!~"rootfs|HarddiskVolume.+"}) by (prometheus_from, node) - sum(node_filesystem_free_bytes{device!~"rootfs|HarddiskVolume.+"}) by (prometheus_from, node)) / sum(node_filesystem_size_bytes{device!~"rootfs|HarddiskVolume.+"}) by (prometheus_from, node))    )
+
+  node_memory: topk(5,      (1 - sum(node_memory_MemAvailable_bytes) by (prometheus_from, node) / sum(node_memory_MemTotal_bytes) by (prometheus_from, node))    )
+
+  node_cpu: topk(5, 1 - (avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) by (prometheus_from, node)))
+
+  node_disk_write_top: topk(5,    max_over_time(      sum(rate(node_disk_written_bytes_total[5m])) by (prometheus_from, node, node_id)[%(duration)s:]    )  )
+
+  node_disk_write: (    sum(      rate(node_disk_written_bytes_total{node_id=~"%(params)s"}[5m])    ) by (prometheus_from, node)  )
+
+  node_disk_read_top: topk(5,    max_over_time(      sum(rate(node_disk_read_bytes_total[5m])) by (prometheus_from, node, node_id)[%(duration)s:]    )  )
+
+  node_disk_read: (    sum(      rate(node_disk_written_bytes_total{node_id=~"%(params)s"}[5m])    ) by (prometheus_from, node)  )
+
+  node_network_transmit_rate_top: topk(5,    max_over_time(      sum(rate(node_network_transmit_bytes_total[5m])) by (prometheus_from, node, node_id)[%(duration)s:]    )  )
+
+  node_network_transmit_rate: (    sum(      rate(node_network_transmit_bytes_total{node_id=~"%(params)s"}[5m])    ) by (prometheus_from, node)  )
+
+  node_network_receive_rate_top: topk(5,    max_over_time(      sum(rate(node_network_receive_bytes_total[5m])) by (prometheus_from, node, node_id)[%(duration)s:]    )  )
+
+  node_network_receive_rate: (    sum(      rate(node_network_transmit_bytes_total{node_id=~"%(params)s"}[5m])    ) by (prometheus_from, node)  )
+
+  pod_network_transmit_top: topk(10,    max_over_time(      sum(rate(container_network_transmit_bytes_total{pod!=""}[5m])) by (pod_id, pod)[%(duration)s:]    )  )
+
+  pod_network_transmit: (    sum(      rate(container_network_transmit_bytes_total{pod_id=~"%(params)s"}[5m])    ) by (prometheus_from, pod, namespace)  )
+
+  pod_network_receive_top: topk(10,    max_over_time(      sum(rate(container_network_receive_bytes_total{pod!=""}[5m])) by (pod_id, pod)[%(duration)s:]    )  )
+
+  pod_network_receive: (    sum(      rate(container_network_receive_bytes_total{pod_id=~"%(params)s"}[5m])    ) by (prometheus_from, pod, namespace)  )
+
+  pod_memory_utilization_top: topk(10,    max_over_time(      container_memory_working_set_bytes{container="", pod!=""}[%(duration)s]    )  )
+
+  pod_memory_utilization: container_memory_working_set_bytes{container="",pod_id=~"%(params)s"}
+
+  pod_cpu_utilization_top: topk(10,    max_over_time(      rate(        container_cpu_usage_seconds_total{container="", pod!=""}[5m])[%(duration)s:]      )  )
+
+  pod_cpu_utilization: rate(container_cpu_usage_seconds_total{pod_id=~"%(params)s", container="", pod!=""}[5m])
+
+  container_memory_top: topk(5,    max_over_time(        kube_pod_container_resource_requests_memory_bytes[5m]    )  )
+
+  container_cpu_top: topk(5,    max_over_time(      kube_pod_container_resource_requests_cpu_cores[5m]    )  )
+
+  top_url_body: k8s/clusters/c-dxfmr/api/v1/namespaces/cattle-global-data/services/http:access-dashboard:80/proxy/thanos-api/api/v1/query
+
+  range_url_body: k8s/clusters/c-dxfmr/api/v1/namespaces/cattle-global-data/services/http:access-dashboard:80/proxy/thanos-api/api/v1/query_range
